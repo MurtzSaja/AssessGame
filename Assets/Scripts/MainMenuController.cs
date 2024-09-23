@@ -24,8 +24,10 @@ namespace AssessGame
     {
         [SerializeField]
         private List<DifficultyData> difficultyToggles;
+        [SerializeField]
+        private Button playBtn;
         private OnChangeDifficulty OnChangeDifficulty;
-        public void Init(DifficultyType lastDifficulty,OnChangeDifficulty onChangeDifficulty)
+        public void Init(DifficultyType lastDifficulty, OnChangeDifficulty onChangeDifficulty, Action OnPlay)
         {
             for (int i = 0; i < difficultyToggles.Count; ++i)
             {
@@ -37,6 +39,8 @@ namespace AssessGame
                 difficultyToggles[i].toggleControl.onValueChanged.AddListener(OnTogglevalueChanged);
             }
             this.OnChangeDifficulty = onChangeDifficulty;
+            playBtn.onClick.RemoveAllListeners();
+            playBtn.onClick.AddListener(() => { OnPlay(); });
         }
 
         private void OnTogglevalueChanged(bool state)
