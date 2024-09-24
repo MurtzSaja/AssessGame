@@ -1,19 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace AssessGame
 {
-    public enum CardFlipState
+    internal enum CardFlipState
     {
         Front,
         Back
     }
 
-    public class CardItemController : MonoBehaviour, IPointerClickHandler
+    internal class CardItemController : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField]
         private string imageToSetName;
@@ -25,24 +26,29 @@ namespace AssessGame
         private GameObject frontImageHolder;
         [SerializeField]
         private float rotateTime;
-        [SerializeField]
+
         private CardFlipState flipState = CardFlipState.Back;
 
         private Coroutine flipRoutine;
         private Action<CardItemController> checkCard;
-        public string ImageToSetName { get => imageToSetName; private set => imageToSetName = value; }
+        private bool hinting;
+        private float hintDuration;
+        internal string ImageToSetName { get => imageToSetName; private set => imageToSetName = value; }
+        internal Sprite BackImage { get => backImage.sprite; }
 
-        public void Init(Sprite imageToSet, Action<CardItemController> checkCard)
+        internal void Init(Sprite imageToSet, Action<CardItemController> checkCard, float hintDuration,ref GridController.OnHint OnShowHint)
         {
+            this.hintDuration = hintDuration;
             frontImage.sprite = imageToSet;
             imageToSetName = imageToSet.name;
             this.checkCard = checkCard;
             holder.gameObject.SetActive(true);
+            OnShowHint += FlipForHint;
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (flipRoutine != null || flipState != CardFlipState.Front)
+            if (flipRoutine != null || flipState != CardFlipState.Back || hinting)
             {
                 return;
             }
@@ -50,7 +56,25 @@ namespace AssessGame
             flipRoutine = StartCoroutine(Flip(flipState, rotateTime));
         }
 
-        IEnumerator Flip(CardFlipState cardFlipState, float rotateTime)
+        internal void ResetFlip(bool snapRotateToDeactivate = false)
+        {
+            if (flipState == CardFlipState.Front && gameObject.activeInHierarchy)
+            {
+                flipRoutine = StartCoroutine(Flip(flipState, snapRotateToDeactivate ? 0 : rotateTime));
+                holder.gameObject.SetActive(!snapRotateToDeactivate);
+            }
+        }
+
+        internal void ResetCard()
+        {
+            frontImageHolder.SetActive(false);
+            backImage.gameObject.SetActive(true);
+            flipState = CardFlipState.Front;
+            holder.rotation = Quaternion.identity;
+            gameObject.SetActive(false);
+        }
+
+        private IEnumerator Flip(CardFlipState cardFlipState, float rotateTime, bool isForHint = false)
         {
             float timer = 0;
             Quaternion orgRot = transform.rotation;
@@ -68,15 +92,15 @@ namespace AssessGame
                     {
                         switch (cardFlipState)
                         {
-                            case CardFlipState.Front:
+                            case CardFlipState.Back:
                                 frontImageHolder.SetActive(true);
                                 backImage.gameObject.SetActive(false);
-                                flipState = CardFlipState.Back;
+                                flipState = CardFlipState.Front;
                                 break;
-                            case CardFlipState.Back:
+                            case CardFlipState.Front:
                                 frontImageHolder.SetActive(false);
                                 backImage.gameObject.SetActive(true);
-                                flipState = CardFlipState.Front;
+                                flipState = CardFlipState.Back;
                                 break;
                             default:
                                 break;
@@ -93,20 +117,26 @@ namespace AssessGame
                 yield return null;
             }
             flipRoutine = null;
-            if (cardFlipState == CardFlipState.Front)
+            if (!isForHint && cardFlipState == CardFlipState.Back)
             {
                 checkCard?.Invoke(this);
             }
             yield break;
         }
 
-        public void ResetFlip(bool snapRotateToDeactivate = false)
+        private void FlipForHint()
         {
-            if (flipState == CardFlipState.Back)
+            IEnumerator HintFilp()
             {
-                flipRoutine = StartCoroutine(Flip(flipState, snapRotateToDeactivate ? 0 : rotateTime));
-                holder.gameObject.SetActive(!snapRotateToDeactivate);
+                hinting = true;
+                flipRoutine = StartCoroutine(Flip(flipState, rotateTime, true));
+                yield return flipRoutine;
+                yield return new WaitForSeconds(hintDuration);
+                flipRoutine = StartCoroutine(Flip(flipState, rotateTime, true));
+                yield return flipRoutine;
+                hinting = false;
             }
+            StartCoroutine(HintFilp());
         }
     }
 }

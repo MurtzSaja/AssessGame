@@ -13,17 +13,20 @@ MonoBehaviour:
   m_Name: GameGenDataSCRO
   m_EditorClassIdentifier: 
   difficultyGrids:
-  - toMatchCount: 2
+  - hintDuration: 2
+    toMatchCount: 2
     DifficultyType: 0
     supportedGridSizes:
     - {x: 2, y: 2}
     - {x: 4, y: 2}
-  - toMatchCount: 2
+  - hintDuration: 1
+    toMatchCount: 2
     DifficultyType: 1
     supportedGridSizes:
     - {x: 2, y: 3}
     - {x: 6, y: 2}
-  - toMatchCount: 2
+  - hintDuration: 0.5
+    toMatchCount: 2
     DifficultyType: 2
     supportedGridSizes:
     - {x: 5, y: 6}
@@ -60,3 +63,6 @@ MonoBehaviour:
   - {fileID: -1392168281, guid: 6a92f5e9f5799224b8c107db19d9c463, type: 3}
   - {fileID: 1722590609, guid: 6a92f5e9f5799224b8c107db19d9c463, type: 3}
   - {fileID: -467513520, guid: 6a92f5e9f5799224b8c107db19d9c463, type: 3}
+  matchAwardScore: 1
+  matchComboAwardScore: 4
+  matchCountForCombo: 2

@@ -8,9 +8,9 @@ namespace AssessGame
 {
     public class GameManager : MonoBehaviour
     {
-        private GameManager instance;
+        private static GameManager instance;
 
-        public GameManager Instance
+        public static GameManager Instance
         { get { return instance; } }
         [SerializeField]
         private GameGenDataScriptableObject gameGenData;
@@ -18,6 +18,12 @@ namespace AssessGame
         private MainMenuController mainMenuController;
         [SerializeField]
         private MainGameController mainGameController;
+        [SerializeField]
+        private AudioManager audioManager;
+        [SerializeField]
+        private ScoreManager scoreManager;
+        [SerializeField]
+        private SideMenuController sideMenuController;
         [SerializeField]
         private DifficultyType gameDifficulty;
 
@@ -45,9 +51,18 @@ namespace AssessGame
             {
                 gameDifficulty = DifficultyType.Easy;
             }
-            mainMenuController.Init(gameDifficulty, (diffculty) => { gameDifficulty = diffculty; PlayerPrefs.SetInt("difficulty", (int)diffculty); }, () => { mainGameController.InitGame(gameGenData.DifficultyGrids.Where(x => x.DifficultyType == gameDifficulty).FirstOrDefault(), gameGenData.CardFrontSprites,gameGenData.CardBack); mainMenuController.gameObject.SetActive(false); });
+            scoreManager.Init(gameGenData.MatchAwardScore, gameGenData.MatchComboAwardScore, gameGenData.MatchCountForCombo);
+            sideMenuController.Init(() =>
+            {
+                mainGameController.ResetGameBoard();
+                mainMenuController.gameObject.SetActive(true);
+                mainGameController.gameObject.SetActive(false);
+            }, () => 
+            { 
+                mainGameController.InitGame(gameGenData.DifficultyGrids.Where(x => x.DifficultyType == gameDifficulty).FirstOrDefault(), gameGenData.CardFrontSprites, gameGenData.CardBack); mainMenuController.gameObject.SetActive(false); 
+            }, scoreManager);
+            audioManager.Init();
+            mainMenuController.Init(gameDifficulty, (diffculty) => { gameDifficulty = diffculty; PlayerPrefs.SetInt("difficulty", (int)diffculty); }, () => { mainGameController.InitGame(gameGenData.DifficultyGrids.Where(x => x.DifficultyType == gameDifficulty).FirstOrDefault(), gameGenData.CardFrontSprites, gameGenData.CardBack); mainMenuController.gameObject.SetActive(false); });
         }
-
-
     }
 }

@@ -1,13 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace AssessGame
 {
-    public delegate void OnChangeDifficulty(DifficultyType difficultyType);
-    public enum DifficultyType
+    internal delegate void OnChangeDifficulty(DifficultyType difficultyType);
+    internal enum DifficultyType
     {
         Easy,
         Medium,
@@ -15,19 +16,21 @@ namespace AssessGame
     }
 
     [Serializable]
-    public class DifficultyData
+    internal class DifficultyData
     {
         public Toggle toggleControl;
         public DifficultyType difficultyType;
     }
-    public class MainMenuController : MonoBehaviour
+    internal class MainMenuController : MonoBehaviour
     {
         [SerializeField]
         private List<DifficultyData> difficultyToggles;
         [SerializeField]
         private Button playBtn;
+        [SerializeField]
+        private TextMeshProUGUI highScoreTxt;
         private OnChangeDifficulty OnChangeDifficulty;
-        public void Init(DifficultyType lastDifficulty, OnChangeDifficulty onChangeDifficulty, Action OnPlay)
+        internal void Init(DifficultyType lastDifficulty, OnChangeDifficulty onChangeDifficulty, Action OnPlay)
         {
             for (int i = 0; i < difficultyToggles.Count; ++i)
             {
@@ -41,6 +44,11 @@ namespace AssessGame
             this.OnChangeDifficulty = onChangeDifficulty;
             playBtn.onClick.RemoveAllListeners();
             playBtn.onClick.AddListener(() => { OnPlay(); });
+            highScoreTxt.text = ScoreManager.Instance.GetHighScore().ToString();
+            ScoreManager.Instance.onHighScoreChange += (highScore) =>
+            {
+                highScoreTxt.text = highScore.ToString();
+            };
         }
 
         private void OnTogglevalueChanged(bool state)
