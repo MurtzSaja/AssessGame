@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3688662213248245708}
   - component: {fileID: 3688662213248245709}
+  - component: {fileID: 6913013574333454609}
   m_Layer: 0
   m_Name: Gamemanager
   m_TagString: Untagged
@@ -44,5 +45,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18c91ae9ec01d2d4d8ee094024970275, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameGenData: {fileID: 11400000, guid: d94ec869ea12b794cb28ba75d71d341d, type: 2}
   mainMenuController: {fileID: 0}
+  mainGameController: {fileID: 0}
+  audioManager: {fileID: 0}
   gameDifficulty: 0
+--- !u!114 &6913013574333454609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3688662213248245711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5284981b88eae844792c4403cb5ae804, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
